@@ -1,0 +1,12 @@
+.battle-box {
+    border: 1px solid;
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 16px;
+    flex: 1;
+}
+
+.pokemon-row {
+    display: flex;
+    align-items: center;
+}
