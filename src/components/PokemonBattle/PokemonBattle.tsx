@@ -4,7 +4,7 @@ import { usePokemonDetailQuery } from '../../services/usePokemonDetailQuery';
 import { useEffect, useState } from 'react';
 import { PokemonMove } from '../../models/Pokemon';
 import BattleLog from '../BattleLog/BattleLog';
-import PokemonName from '../PokemonName/PokemonName';
+import PokemonCard from '../PokemonCard/PokemonCard';
 
 type P = {
   myPokemonId?: number;
@@ -15,29 +15,36 @@ function PokemonBattle({ myPokemonId, wildPokemonId }: P) {
   const [randomMyPokemonMove, setRandomMyPokemonMove] = useState<PokemonMove>();
   const [randomWildPokemonMove, setRandomWildPokemonMove] = useState<PokemonMove>();
 
-  const { data: wildPokemonData, isFetching: isFetchingWildPokemon } = usePokemonDetailQuery({ pokemonId: wildPokemonId, enabled: wildPokemonId !== undefined });
-  const { data: myPokemonData, isFetching: isFetchingMyPokemon } = usePokemonDetailQuery({ pokemonId: myPokemonId, enabled: myPokemonId !== undefined });
+  // fetches 2 pokemon
+  const { data: wildPokemon, isFetching: isFetchingWildPokemon } = usePokemonDetailQuery({ pokemonId: wildPokemonId, enabled: wildPokemonId !== undefined });
+  const { data: myPokemon, isFetching: isFetchingMyPokemon } = usePokemonDetailQuery({ pokemonId: myPokemonId, enabled: myPokemonId !== undefined });
 
-  const { data: myPokemonMoveData, isFetching: isFetchingMyPokemonMove } = useMoveQuery({ moveName: randomMyPokemonMove?.move.name, enabled: randomMyPokemonMove !== undefined });
-  const { data: wildPokemonMoveData, isFetching: isFetchingWildPokemonMove } = useMoveQuery({ moveName: randomWildPokemonMove?.move.name, enabled: randomWildPokemonMove !== undefined });
-  
+  // fetches move detail for each pokemon after pokemon is fetched
+  const { data: myPokemonSelectedMove, isFetching: isFetchingMyPokemonSelectedMove } = useMoveQuery({ moveName: randomMyPokemonMove?.move.name, enabled: randomMyPokemonMove !== undefined });
+  const { data: wildPokemonSelectedMove, isFetching: isFetchingWildPokemonSelectedMove } = useMoveQuery({ moveName: randomWildPokemonMove?.move.name, enabled: randomWildPokemonMove !== undefined });
+
   useEffect(() => {
-    setRandomMyPokemonMove(myPokemonData?.moves[random(1, myPokemonData?.moves.length + 1)]);
-    setRandomWildPokemonMove(myPokemonData?.moves[random(1, myPokemonData?.moves.length + 1)]);
-  }, [myPokemonData, wildPokemonData]);
+    // selects random move
+    setRandomMyPokemonMove(myPokemon?.moves[random(1, myPokemon?.moves.length + 1)]);
+    setRandomWildPokemonMove(wildPokemon?.moves[random(1, wildPokemon?.moves.length + 1)]);
+  }, [myPokemon, wildPokemon]);
 
-  if (isFetchingWildPokemon || isFetchingMyPokemon || isFetchingMyPokemonMove || isFetchingWildPokemonMove || !wildPokemonData || !myPokemonData || !myPokemonMoveData || !wildPokemonMoveData) {
+  if (isFetchingWildPokemon || isFetchingMyPokemon || isFetchingMyPokemonSelectedMove || isFetchingWildPokemonSelectedMove) {
     return <>Loading..</>
+  }
+
+  if (!wildPokemon || !myPokemon || !myPokemonSelectedMove || !wildPokemonSelectedMove) {
+    return <>Something went wrong..</>
   }
 
   return (
     <>
-      <div className="battle-box">
+      <div className="battle-box" data-testid="battle-box" >
         <div className="pokemon-row">
-          <PokemonName pokemonName={wildPokemonData.name} move={wildPokemonMoveData} />
+          <PokemonCard pokemonName={wildPokemon.name} move={wildPokemonSelectedMove} />
           <div>
             <img
-              src={wildPokemonData.frontSprite ?? ''}
+              src={wildPokemon.frontSprite ?? ''}
               alt="Wild pokemon"
               width={200}
               height={200}
@@ -47,16 +54,21 @@ function PokemonBattle({ myPokemonId, wildPokemonId }: P) {
         <div className="pokemon-row">
           <div>
             <img
-              src={myPokemonData.backSprite ?? ''}
+              src={myPokemon.backSprite ?? ''}
               alt="My pokemon"
               width={300}
               height={300}
             />
           </div>
-          <PokemonName pokemonName={myPokemonData.name} move={myPokemonMoveData} />
+          <PokemonCard pokemonName={myPokemon.name} move={myPokemonSelectedMove} />
         </div>
       </div>
-      <BattleLog myPokemonMoveData={myPokemonMoveData} wildPokemonMoveData={wildPokemonMoveData} myPokemonData={myPokemonData} wildPokemonData={wildPokemonData} />
+      <BattleLog
+        myPokemonSelectedMove={myPokemonSelectedMove}
+        wildPokemonSelectedMove={wildPokemonSelectedMove}
+        myPokemon={myPokemon}
+        wildPokemon={wildPokemon}
+      />
     </>
   );
 }

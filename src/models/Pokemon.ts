@@ -1,4 +1,4 @@
-export type PokemonResponseDataObject = {
+type PokemonDTO = {
     id: number;
     name: string;
     sprites: {
@@ -26,7 +26,7 @@ export class Pokemon {
     baseStat: number;
     selectedMove: any;
 
-    constructor(data: PokemonResponseDataObject) {
+    constructor(data: PokemonDTO) {
         this.id = data.id;
         this.name = data.name;
         this.frontSprite = data.sprites.front_default;

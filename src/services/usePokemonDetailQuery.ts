@@ -6,7 +6,7 @@ export const usePokemonDetailQuery = ({ pokemonId, enabled = false }: { pokemonI
     return useQuery({
         queryKey: ['pokemon', 'detail', pokemonId], queryFn: async () => {
             const pokemon = await axios
-                .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`) // TODO url could be some variable
+                .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`) // TODO move base url to env variables
                 .then((res) => res.data)
             return new Pokemon(pokemon);
         },

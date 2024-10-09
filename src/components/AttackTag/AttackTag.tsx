@@ -1,6 +1,6 @@
 type P = {
     name: string;
-    power: number | null;
+    power: number | null; // some moves don't have power (status moves)
 }
 
 function AttackTag({ name, power }: P) {

@@ -1,16 +1,24 @@
+import { SelectedMove } from "../models/SelectedMove";
 import { Pokemon } from "../models/Pokemon";
 
-export const useGetBattleResult = (myPokemonMoveData: any, wildPokemonMoveData: any, myPokemonData?: Pokemon, wildPokemonData?: Pokemon) => {
-    const myPokemonMovePower = myPokemonMoveData?.power;
-    const wildPokemonMovePower = wildPokemonMoveData?.power;
+type P = {
+    myPokemonSelectedMove: SelectedMove;
+    wildPokemonSelectedMove: SelectedMove;
+    myPokemon: Pokemon;
+    wildPokemon: Pokemon;
+}
+
+export const useGetBattleResult = ({ myPokemonSelectedMove, wildPokemonSelectedMove, myPokemon, wildPokemon}: P) => {
+    const myPokemonMovePower = myPokemonSelectedMove.power;
+    const wildPokemonMovePower = wildPokemonSelectedMove.power;
 
     if (myPokemonMovePower === wildPokemonMovePower) {
         return 'Draw!';
     }
 
     if (myPokemonMovePower > wildPokemonMovePower) {
-        return `${myPokemonData?.name} lands a decisive blow with ${myPokemonMoveData?.name} knocking out ${wildPokemonData?.name}!`;
+        return `${myPokemon.name} lands a decisive blow with ${myPokemonSelectedMove.name} knocking out ${wildPokemon.name}!`;
     }
 
-    return `${wildPokemonData?.name} lands a decisive blow with ${wildPokemonMoveData?.name} knocking out ${myPokemonData?.name}!`;
+    return `${wildPokemon.name} lands a decisive blow with ${wildPokemonSelectedMove.name} knocking out ${myPokemon.name}!`;
 };
